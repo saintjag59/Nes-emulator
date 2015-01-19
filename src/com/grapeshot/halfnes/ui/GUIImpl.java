@@ -1,6 +1,7 @@
 package com.grapeshot.halfnes.ui;
 //HalfNES, Copyright Andrew Hoffman, October 2010
 
+import com.grapeshot.halfnes.FileUtil;
 import com.grapeshot.halfnes.FileUtils;
 import com.grapeshot.halfnes.NES;
 import com.grapeshot.halfnes.PrefsSingleton;
@@ -9,6 +10,8 @@ import com.grapeshot.halfnes.cheats.ActionReplay;
 import com.grapeshot.halfnes.cheats.ActionReplayGui;
 import com.grapeshot.halfnes.video.NTSCRenderer;
 import com.grapeshot.halfnes.video.Renderer;
+import sun.java2d.pipe.LCDTextRenderer;
+
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -215,6 +218,31 @@ public class GUIImpl extends JFrame implements GUIInterface {
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
         menus.add(help);
         this.setJMenuBar(menus);
+
+        //here additinal frame were will be all games from selected catalogue
+        JFrame additinalFrame = new JFrame("GameList");
+
+        final JList <File> list = new JList(FileUtil.getFileList("GamesDir"));
+        list.setFixedCellHeight(30);
+        list.setFont(list.getFont().deriveFont(18.0f));
+        JScrollPane jScrollPane = new JScrollPane(list);
+        Container container = additinalFrame.getContentPane();
+        container.add(jScrollPane, BorderLayout.CENTER);
+        additinalFrame.setSize(700, 900);
+        additinalFrame.setVisible(true);
+
+
+        MouseListener ml = new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                if(e.getClickCount() == 2){
+                    String selectedFile = list.getSelectedValue().getAbsolutePath();
+                    loadROM(selectedFile);
+                }
+            }
+        };
+        list.addMouseListener(ml);
     }
 
     public void loadROM() {
@@ -507,6 +535,9 @@ public class GUIImpl extends JFrame implements GUIInterface {
                         + "\n"
                         + "This program is free software licensed under the GPL version 3, and comes with \n"
                         + "NO WARRANTY of any kind. (but if something's broken, please report it). \n"
+                        + "======================================================================= \n"
+                        + "upgraded by Kolesov Konstantin, 2015 (kostkol87@gmail.com)              \n"
+                        + "======================================================================= \n"
                         + "See the license.txt file for details.");
             } else if (arg0.getActionCommand().equals("ROM Info")) {
                 String info = nes.getrominfo();
